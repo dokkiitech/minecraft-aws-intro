@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger("mc-presence")
 
 GATEWAY = "wss://gateway.discord.gg/?v=10&encoding=json"
-BOT_TOKEN_PARAM = os.environ["BOT_TOKEN_PARAM"]
+PARAMETER_NAME = os.environ["BOT_TOKEN_PARAM"]
 PRESENCE_TEXT = os.environ.get("PRESENCE_TEXT", "mcサーバーオンライン")
 STATE_FILE = "/run/mc-ondemand.state"  # watchdog が停止フェーズで "stopping" を書く
 UPDATE_INTERVAL = 10
@@ -39,7 +39,7 @@ def bot_token() -> str:
     global _token
     if _token is None:
         _token = boto3.client("ssm").get_parameter(
-            Name=BOT_TOKEN_PARAM, WithDecryption=True
+            Name=PARAMETER_NAME, WithDecryption=True
         )["Parameter"]["Value"]
     return _token
 

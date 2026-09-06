@@ -9,7 +9,7 @@ This is not just another game server. What you will build:
 - Type `/mc start` in Discord and an EC2 instance boots — ready to play in 60–90 seconds
 - When everyone has left for 15 minutes, it backs up the world to S3 and **stops itself**
 - Even if auto-stop breaks, a CloudWatch alarm and AWS Budgets are watching in layers
-- Roughly **$4.30/month for 40 hours of play** (vs. ~$20/month if it ran 24/7)
+- Roughly **$4.20/month for 40 hours of play** (vs. ~$42/month if it ran 24/7)
 
 In other words, you get to experience the essence of the cloud — **run things only when you
 need them and pay only for what you use** — while playing a game.
@@ -51,7 +51,7 @@ corresponding chapter (currently in Japanese — translations welcome!).
 - An AWS account (expect a few dollars a month — see [00 Introduction](docs/00-intro.md))
 - A domain managed on Cloudflare (free plan is fine; Route 53 also works, see [03](docs/03-ec2.md))
 - A Discord server (a place to put the bot)
-- Terraform >= 1.13 / Python 3 / AWS CLI
+- Terraform >= 1.13 / Python 3 with pip / zip / AWS CLI
 
 ## Quick start
 
@@ -74,7 +74,7 @@ terraform apply
 # 4. Set `terraform output interactions_endpoint_url` in the Discord Developer
 #    Portal, then register slash commands with bot/register_commands.py
 
-# When you're done (deletes everything)
+# When you're done (see docs/08: empty S3 first; delete SSM parameters separately)
 terraform destroy
 ```
 

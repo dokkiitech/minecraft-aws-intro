@@ -4,7 +4,7 @@
 
 # Discord Developer Portal → General Information から。秘密情報ではない
 discord_application_id = "000000000000000000"
-discord_public_key     = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+discord_public_key     = "replace-with-discord-public-key"
 
 # サーバーの FQDN と、それが属する Cloudflare ゾーン ID
 record_name = "mc.example.com"

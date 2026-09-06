@@ -1,0 +1,12 @@
+title = "minecraft-aws-intro gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Known placeholders and detector-only identifiers in the initial commit"
+regexTarget = "match"
+regexes = [
+  '''discord_public_key\s*=\s*"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"''',
+  '''BOT_TOKEN_PARAM,\s*WithDecryption=True''',
+]

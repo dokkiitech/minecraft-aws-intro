@@ -31,6 +31,9 @@ API Gateway in front). `NONE` means anyone can hit the URL — but it is not
 unauthenticated: **authentication happens at the application layer via Ed25519
 signature verification** (next section).
 
+With `authorization_type = "NONE"`, the AWS provider creates both public invocation
+permissions required by current Lambda Function URL behavior.
+
 ## Signature verification — rejecting forged requests
 
 Discord signs every request (`X-Signature-Ed25519`). The bot verifies it with the

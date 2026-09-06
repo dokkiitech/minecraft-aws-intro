@@ -14,7 +14,8 @@ you would build it for real operation:
 - **Auto-stop**: after 15 minutes with zero players, it saves, backs up the world, and stops itself
 - **Failure detection**: three layers of watchers, designed for the case where auto-stop
   itself breaks, plus a budget alarm
-- **Everything as code**: one `terraform apply` builds it; one `terraform destroy` removes it all
+- **Everything as code**: one `terraform apply` builds the Terraform-managed
+  infrastructure; chapter 08 covers complete teardown, including external state
 
 "Run things only when needed to minimize pay-as-you-go costs", "design for failure with
 layered defenses", "manage infrastructure as code" — these are exactly the ideas you use
@@ -30,15 +31,20 @@ in professional cloud work.
 
 ## What it costs
 
-**About $2/month if you never play, about $4.30 for 40 hours of play** (Tokyo region).
+**About $2/month if you never play, about $4.20 for 40 hours of play** (Tokyo region).
 
 | Item | Approx. |
 | --- | --- |
-| t3a.medium on-demand, 40 h | ~$2.20 |
+| t3a.medium on-demand, 40 h | ~$2.00 |
+| In-use public IPv4 address, 40 h | ~$0.20 |
 | EBS gp3 20 GB (billed even while stopped) | ~$1.90 |
 | CloudWatch alarm ×1 | $0.10 |
-| Lambda / SSM / S3 / DNS | ~$0 (free tier) |
-| **Total** | **~$4.30 / month** |
+| Lambda / SSM / S3 / DNS | ~$0 at this scale |
+| **Total** | **~$4.20 / month** |
+
+Prices exclude domain registration and data transfer and can change; check the current
+Tokyo-region pricing before deployment. Running continuously is roughly $42/month,
+including the instance, public IPv4 address, EBS, and alarm.
 
 AWS bills for what you use, which makes "forgot to turn it off" the scariest failure
 mode. This setup ships with three safety nets — auto-stop, force-stop, and budget
@@ -80,7 +86,7 @@ Two key points:
 | AWS account | We create one in [chapter 01](01-aws-account.md) |
 | A domain | DNS managed on Cloudflare (domain cost only; Cloudflare free plan is fine). Route 53 works too — the code here targets Cloudflare; see [chapter 03](03-ec2.md) for why, and how to port |
 | Discord account & server | Somewhere to put the bot. Creating a fresh server is fine |
-| A work machine | macOS / Linux / WSL, with Terraform >= 1.13, AWS CLI v2, Python 3 |
+| A work machine | macOS / Linux / WSL, with Terraform >= 1.13, AWS CLI v2, Python 3 with pip, and zip |
 
 > **No domain yet?** Registrars like Cloudflare Registrar sell `.dev` / `.com` domains
 > for around $10/year. You can technically play by raw IP, but the IP changes on every

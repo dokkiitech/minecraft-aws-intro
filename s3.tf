@@ -15,6 +15,16 @@ resource "aws_s3_bucket_public_access_block" "minecraft" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "minecraft" {
+  bucket = aws_s3_bucket.minecraft.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "minecraft" {
   bucket = aws_s3_bucket.minecraft.id
 
@@ -28,6 +38,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "minecraft" {
 
     expiration {
       days = 60
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }

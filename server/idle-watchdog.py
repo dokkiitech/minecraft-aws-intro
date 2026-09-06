@@ -139,17 +139,18 @@ def sync_allowlist(instance_id: str) -> None:
                "`journalctl -u mc-watchdog` を確認してください", YELLOW)
         return
 
-    # bedrock の FIFO 標準入力に allowlist reload を送る(再起動なしで反映)
+    # bedrock の FIFO 標準入力に有効/無効と reload を送る(再起動なしで反映)
     reloaded = False
     try:
         fd = os.open("/run/bedrock/stdin", os.O_WRONLY | os.O_NONBLOCK)
-        os.write(fd, b"allowlist reload\n")
+        enabled = "on" if names else "off"
+        os.write(fd, f"allowlist {enabled}\nallowlist reload\n".encode())
         os.close(fd)
         reloaded = True
     except OSError:
         log.exception("failed to send allowlist reload (applies on next boot)")
 
-    members = ", ".join(f"`{n}`" for n in names) if names else "(空 = 誰も入れません)"
+    members = ", ".join(f"`{n}`" for n in names) if names else "(空 = 誰でも参加できます)"
     suffix = "" if reloaded else "\n(サーバーの次回起動時に反映されます)"
     notify("🔑 allowlist を更新しました", f"現在の許可: {members}{suffix}", BLURPLE)
 
