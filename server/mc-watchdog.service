@@ -1,0 +1,16 @@
+[Unit]
+Description=Minecraft idle watchdog (auto-stop, Discord notify, S3 backup)
+Wants=network-online.target
+After=network-online.target bedrock.service
+StartLimitIntervalSec=300
+StartLimitBurst=3
+OnFailure=mc-alert@%n.service
+
+[Service]
+EnvironmentFile=/etc/mc-ondemand.env
+ExecStart=/usr/bin/python3 /usr/local/bin/idle-watchdog.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

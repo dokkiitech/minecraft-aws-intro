@@ -1,0 +1,16 @@
+[Unit]
+Description=Sync mc-ondemand scripts from S3 bootstrap
+Wants=network-online.target
+After=network-online.target
+# Before= は順序のみ(Requires ではない)。sync に失敗してもサーバー起動は止めない
+Before=mc-dns.service bedrock.service mc-watchdog.service mc-presence.service
+OnFailure=mc-alert@%n.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/mc-ondemand.env
+ExecStart=/usr/local/bin/mc-sync.sh
+
+[Install]
+WantedBy=multi-user.target

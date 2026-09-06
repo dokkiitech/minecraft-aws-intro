@@ -1,0 +1,27 @@
+[Unit]
+Description=Minecraft Bedrock Dedicated Server
+Wants=network-online.target
+After=network-online.target mc-dns.service
+# Restart=on-failure が StartLimitBurst を使い切って初めて OnFailure が発火する
+# (1 回のクラッシュでは鳴らない)
+StartLimitIntervalSec=300
+StartLimitBurst=3
+OnFailure=mc-alert@%n.service
+
+[Service]
+User=bedrock
+Group=bedrock
+WorkingDirectory=/opt/bedrock
+Environment=LD_LIBRARY_PATH=.
+# 標準入力を FIFO にして、外からコンソールコマンドを送れるようにする
+# (watchdog が allowlist reload を流す。3<> の read-write オープンで EOF を防ぐ)
+RuntimeDirectory=bedrock
+ExecStartPre=/usr/bin/bash -c 'rm -f /run/bedrock/stdin && mkfifo /run/bedrock/stdin'
+ExecStart=/usr/bin/bash -c 'exec 3<>/run/bedrock/stdin && exec ./bedrock_server <&3'
+Restart=on-failure
+RestartSec=5
+# 停止時はセーブを待ってから殺す
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

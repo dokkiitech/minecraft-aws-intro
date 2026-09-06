@@ -1,0 +1,10 @@
+# 障害検知②: unit の異常終了時に journal の末尾を添えて Discord へ通知する
+# 使い方: 各 unit に OnFailure=mc-alert@%n.service を書く
+
+[Unit]
+Description=Send Discord alert for failed unit %i
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/mc-ondemand.env
+ExecStart=/usr/local/bin/alert.sh %i

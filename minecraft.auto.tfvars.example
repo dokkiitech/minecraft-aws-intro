@@ -1,0 +1,19 @@
+# cp minecraft.auto.tfvars.example minecraft.auto.tfvars して埋める(gitignore 済み)
+
+# --- 必須 ---
+
+# Discord Developer Portal → General Information から。秘密情報ではない
+discord_application_id = "000000000000000000"
+discord_public_key     = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+# サーバーの FQDN と、それが属する Cloudflare ゾーン ID
+record_name = "mc.example.com"
+cf_zone_id  = "00000000000000000000000000000000"
+
+# --- 任意(デフォルト: t3a.medium / 15分 / $5 / allowlist なし)---
+
+# server_name        = "my-minecraft-server"
+# instance_type      = "t3a.medium"
+# idle_minutes       = 15
+# monthly_budget_usd = 5
+# allowlist          = ["YourGamertag"]

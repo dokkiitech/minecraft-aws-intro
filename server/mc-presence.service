@@ -1,0 +1,15 @@
+[Unit]
+Description=Discord bot presence (mirrors Minecraft server state)
+Wants=network-online.target
+After=network-online.target bedrock.service
+# PartOf は付けない: 停止処理中も「サーバー停止処理中…」を表示し続けたいので
+# bedrock の停止には追従せず、インスタンスの電源断でオフラインになる
+
+[Service]
+EnvironmentFile=/etc/mc-ondemand.env
+ExecStart=/usr/bin/python3 /usr/local/bin/presence-client.py
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

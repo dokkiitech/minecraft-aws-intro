@@ -1,0 +1,27 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.auto.tfvars.example
+crash.log
+tfplan
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Lambda build artifacts
+*.zip
+__pycache__/
+bot/package/
+
+# macOS
+.DS_Store

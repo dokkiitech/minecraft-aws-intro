@@ -1,0 +1,67 @@
+#!/bin/bash
+# 初回起動時のセットアップ(Terraform user_data)
+# S3 の bootstrap/ からスクリプト・unit を取得し、BDS 最新版を入れて常駐化する
+set -euxo pipefail
+exec > /var/log/mc-bootstrap.log 2>&1
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y unzip libcurl4t64 curl jq python3-pip python3-boto3
+pip3 install --break-system-packages "mcstatus>=11,<15" "websockets>=12,<16"
+
+# AWS CLI v2 を公式インストーラーで入れる
+# (noble の apt に awscli は無く、pip の v1 は apt の python3-boto3 と botocore が衝突しうる)
+curl -fsSL -o /tmp/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+unzip -q /tmp/awscliv2.zip -d /tmp
+/tmp/aws/install
+rm -rf /tmp/aws /tmp/awscliv2.zip
+
+# 各 unit が読む環境変数
+cat > /etc/mc-ondemand.env <<EOF
+CF_ZONE_ID=${cf_zone_id}
+CF_TOKEN_PARAM=${cf_token_param}
+WEBHOOK_PARAM=${webhook_param}
+RECORD_NAME=${record_name}
+PUBLIC_ADDR=${public_addr}
+AWS_DEFAULT_REGION=${region}
+BACKUP_BUCKET=${backup_bucket}
+IDLE_MINUTES=${idle_minutes}
+BOOT_GRACE_MINUTES=${boot_grace_minutes}
+BOT_TOKEN_PARAM=${bot_token_param}
+PRESENCE_TEXT=mcサーバーオンライン
+EOF
+chmod 600 /etc/mc-ondemand.env
+
+# スクリプト・systemd unit を配置
+aws s3 sync "s3://${bootstrap_bucket}/bootstrap/" /tmp/bootstrap/
+install -m 755 /tmp/bootstrap/cloudflare-update.sh /usr/local/bin/
+install -m 755 /tmp/bootstrap/idle-watchdog.py /usr/local/bin/
+install -m 755 /tmp/bootstrap/alert.sh /usr/local/bin/
+install -m 755 /tmp/bootstrap/install-bds.sh /usr/local/bin/
+install -m 755 /tmp/bootstrap/mc-sync.sh /usr/local/bin/
+install -m 755 /tmp/bootstrap/presence-client.py /usr/local/bin/
+install -m 644 /tmp/bootstrap/mc-dns.service /etc/systemd/system/
+install -m 644 /tmp/bootstrap/bedrock.service /etc/systemd/system/
+install -m 644 /tmp/bootstrap/mc-watchdog.service /etc/systemd/system/
+install -m 644 /tmp/bootstrap/mc-alert@.service /etc/systemd/system/
+install -m 644 /tmp/bootstrap/mc-sync.service /etc/systemd/system/
+install -m 644 /tmp/bootstrap/mc-presence.service /etc/systemd/system/
+
+# BDS 実行ユーザーと最新版の取得(install-bds.sh は再実行でアップデートにもなる)
+useradd -r -s /usr/sbin/nologin bedrock || true
+mkdir -p /opt/bedrock
+/usr/local/bin/install-bds.sh
+
+# allowlist 本体は S3 の config/allowlist.json が唯一の真実で、
+# 毎起動時に mc-sync.service が取り込む(/mc allow で編集)。ここではフラグだけ設定。
+# view-distance のデフォルト 32 は 2GB インスタンスには重すぎるので絞る
+sed -i \
+  -e 's/^allow-list=.*/allow-list=${allow_list}/' \
+  -e 's/^server-name=.*/server-name=${server_name}/' \
+  -e 's/^view-distance=.*/view-distance=16/' \
+  /opt/bedrock/server.properties
+
+chown -R bedrock:bedrock /opt/bedrock
+
+systemctl daemon-reload
+systemctl enable --now mc-sync mc-dns bedrock mc-watchdog mc-presence
