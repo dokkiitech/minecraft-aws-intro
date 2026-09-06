@@ -83,5 +83,5 @@ terraform destroy
 改善の PR・issue も歓迎します。詳しくは [CONTRIBUTING.md](CONTRIBUTING.md) を
 参照してください(`main` への直接 push は受け付けていません。fork → PR でお願いします)。
 
-この教材は [dokkiitech/dokkiitech-infra](https://github.com/dokkiitech/dokkiitech-infra) で
-実際に運用している構成を汎用化したものです。
+この教材は、作者が実際に運用している構成(private のインフラリポジトリで管理)を
+汎用化したものです。
