@@ -9,7 +9,7 @@
 - Discord で `/mc start` と打つと EC2 が起動し、60〜90 秒で遊べるようになる
 - 全員が退出して 15 分経つと、ワールドを S3 にバックアップして**勝手に停止**する
 - 止め忘れても、CloudWatch アラームと AWS Budgets が二重三重に見張っている
-- 月 40 時間遊んで**約 $4.3/月**(24 時間稼働だと約 $20/月のところを 1/5 に)
+- 月 40 時間遊んで**約 $4.2/月**(24 時間稼働だと約 $42/月)
 
 つまり「**必要なときだけ動かして、使った分だけ払う**」というクラウドの本質を、
 遊びながら体験できる構成になっています。
@@ -50,7 +50,7 @@
 - AWS アカウント(無料枠でなくても月数百円で収まる想定。[00 はじめに](docs/ja/00-intro.md) 参照)
 - Cloudflare で管理している独自ドメイン(無料プランで OK)
 - Discord サーバー(Bot を置く場所)
-- Terraform >= 1.13 / Python 3 / AWS CLI
+- Terraform >= 1.13 / Python 3(pip を含む)/ zip / AWS CLI
 
 ## クイックスタート
 
@@ -73,7 +73,7 @@ terraform apply
 # 4. terraform output interactions_endpoint_url を Discord に設定し、
 #    bot/register_commands.py でスラッシュコマンドを登録
 
-# 遊び終わったら(全リソース削除)
+# 遊び終わったら(docs/08 に従って S3 を空にし、SSM パラメータも別途削除)
 terraform destroy
 ```
 

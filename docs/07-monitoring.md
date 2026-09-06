@@ -3,7 +3,7 @@
 Files: `monitoring.tf` / `budget.tf` / `lambda.tf` (EventBridge) / `server/idle-watchdog.py` / `server/alert.sh`
 
 The scariest failure here is "auto-stop breaks and the server runs with nobody playing"
-— about $20/month at 24/7. So shutdown is guarded by an almost excessive
+— about $42/month at 24/7. So shutdown is guarded by an almost excessive
 **three detection layers plus two safety nets**, where any single failure is caught by
 another layer. Read it as a miniature of distributed-systems design.
 
@@ -54,9 +54,11 @@ alarm_actions       = ["arn:aws:automate:${local.region}:ec2:stop"]
 
 "NetworkOut near zero for 30 minutes = running with nobody connected" is detected from
 CloudWatch metrics, and the **alarm action stops the instance directly** (no Lambda
-involved). The 50 KB / 5 min threshold sits above the constant noise of the SSM agent
-and far below in-game traffic. `treat_missing_data = "notBreaching"` keeps the alarm
-quiet while the instance is stopped (no metrics arriving). Cost: $0.10/month for one alarm.
+involved). The 50 KB / 5 min threshold is a heuristic, not player-count awareness:
+measure your server's traffic and tune it if needed. A connected but unusually quiet
+server can be stopped, and this last-resort action does not run the graceful in-instance
+save and backup path. `treat_missing_data = "notBreaching"` keeps the alarm quiet while
+the instance is stopped (no metrics arriving). Cost: $0.10/month for one alarm.
 
 ## Safety net ②: AWS Budgets — the bill itself, watched
 
@@ -83,8 +85,9 @@ integration pattern worth noting.
 | Budgets $5 | everything unforeseen above |
 | account-wide budget (ch. 01) | leftovers outside this project |
 
-Not "be careful" but "make it impossible to fail silently". Once this attitude sticks,
-even a personal learning account becomes a safe place to experiment.
+Not merely "be careful", but design failures to become visible and limit their impact.
+Once this attitude sticks, even a personal learning account becomes a safer place to
+experiment.
 
 ---
 

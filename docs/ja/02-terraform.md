@@ -9,9 +9,11 @@ AWS コンソールをポチポチして作ったインフラは、
 - 同じ環境をもう 1 つ作るのに同じ作業を繰り返す
 
 という問題があります。Terraform は「あるべきインフラの状態」をコードで書き、
-実際の AWS をその状態に**収束**させるツールです。この教材の全リソース
-(EC2、Lambda、IAM、S3、アラーム、予算…)は `.tf` ファイルに書かれていて、
-`terraform apply` 一発で構築、`terraform destroy` 一発で全削除できます。
+実際の AWS をその状態に**収束**させるツールです。この教材で Terraform が管理する
+インフラ(EC2、Lambda、IAM、S3、アラーム、予算…)は `.tf` ファイルに書かれていて、
+`terraform apply` で構築できます。削除時は S3 バケットを空にしてから
+`terraform destroy` を実行し、Terraform 管理外で作った SSM パラメータも別途削除します
+(08 章)。
 
 ## 基本の 3 コマンド
 
@@ -64,7 +66,7 @@ Terraform は「自分が作ったリソースの一覧と実際の ID」を `te
 
 ## この教材ならではの Terraform テクニック
 
-**`default_tags` で全リソースにタグを付ける**(`main.tf`)
+**`default_tags` で対応リソースに既定タグを付ける**(`main.tf`)
 
 ```hcl
 provider "aws" {
@@ -75,9 +77,9 @@ provider "aws" {
 }
 ```
 
-プロバイダに書いておくと全リソースに `Project=Minecraft` が付きます。このタグが
-「コンソールでひとまとめに見る(Resource Groups)」「IAM の権限をこのプロジェクトに限定する」
-「予算をこのプロジェクトだけで区切る」の 3 つを支える、この構成の背骨です。
+プロバイダに書いておくと、タグ対応リソースに `Project=Minecraft` が付きます。このタグが
+「コンソールでまとめて見る(Resource Groups)」「IAM の権限をこのプロジェクトの EC2 に限定する」
+「タグ付きのプロジェクト費用で予算を区切る」の 3 つを支える、この構成の背骨です。
 
 **`lifecycle.ignore_changes` で作り直しを防ぐ**(`ec2.tf`)
 

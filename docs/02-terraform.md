@@ -9,9 +9,11 @@ Infrastructure built by clicking around the AWS console has problems:
 - Building the same environment again means repeating the same manual work
 
 Terraform lets you describe the **desired state** of your infrastructure as code and
-**converges** the real AWS environment to match. Every resource in this project (EC2,
-Lambda, IAM, S3, alarms, budgets…) lives in `.tf` files: `terraform apply` builds it
-all, `terraform destroy` removes it all.
+**converges** the real AWS environment to match. The managed infrastructure in this
+project (EC2, Lambda, IAM, S3, alarms, budgets…) lives in `.tf` files:
+`terraform apply` builds it all. `terraform destroy` removes the Terraform-managed
+resources after the S3 bucket is emptied; the SSM parameters created outside Terraform
+must be deleted separately (chapter 08).
 
 ## The three basic commands
 
@@ -68,7 +70,7 @@ it owns.
 
 ## Terraform techniques this project shows off
 
-**`default_tags`: tag every resource** (`main.tf`)
+**`default_tags`: tag supported resources by default** (`main.tf`)
 
 ```hcl
 provider "aws" {
@@ -79,10 +81,10 @@ provider "aws" {
 }
 ```
 
-Set on the provider, this puts `Project=Minecraft` on every resource. That one tag
-powers three things — a single Resource Group view in the console, IAM permissions
-scoped to this project, and a budget scoped to this project. It is the backbone of the
-whole design.
+Set on the provider, this puts `Project=Minecraft` on resources that support tags.
+That one tag powers three things — a Resource Group view in the console, IAM
+permissions scoped to this project's EC2 instance, and a budget scoped to tagged
+project costs. It is the backbone of the whole design.
 
 **`lifecycle.ignore_changes`: prevent accidental replacement** (`ec2.tf`)
 

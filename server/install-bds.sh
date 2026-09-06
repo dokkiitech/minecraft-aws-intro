@@ -1,6 +1,6 @@
 #!/bin/bash
 # Bedrock Dedicated Server の最新版を公式ダウンロード API から取得して /opt/bedrock に展開する。
-# 再実行するとアップデートになる(worlds/ と設定ファイルは保持、旧版は .bak に退避)。
+# 再実行するとアップデートになる(worlds/ と設定ファイルは保持)。
 # minecraft.net は UA なしのリクエストを弾くので curl に UA を付ける。
 set -euo pipefail
 

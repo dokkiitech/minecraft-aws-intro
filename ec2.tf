@@ -1,8 +1,7 @@
 # ゲームサーバー本体。停止中は EBS 代しかかからない
 # - EIP なし(停止中も課金されるため)。動的 Public IP を起動時に Cloudflare へ書き戻す
-# - CPU クレジットは unlimited。standard だと停止→起動のたびに残高 0 から始まり、
-#   ベースライン(2vCPU 合計 40%)に絞られてプレイ中にカクつく。
-#   surplus 課金は自動停止 + Budgets $5 で抑えが効く(最悪でも +$2〜3/月程度)
+# - CPU クレジットは unlimited。standard では残高を使い切るとベースライン
+#   (2vCPU 合計 40%)に絞られる。surplus 課金は自動停止で抑え、Budgets で検知する
 
 data "aws_vpc" "default" {
   default = true
@@ -32,34 +31,24 @@ data "aws_ami" "ubuntu_2404" {
 
 resource "aws_security_group" "bedrock" {
   name        = "minecraft-bedrock"
-  description = "Minecraft Bedrock (UDP 19132/19133)"
+  description = "Minecraft Bedrock (UDP 19132)"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description      = "Bedrock IPv4"
-    from_port        = 19132
-    to_port          = 19132
-    protocol         = "udp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  ingress {
-    description      = "Bedrock IPv6"
-    from_port        = 19133
-    to_port          = 19133
-    protocol         = "udp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "Bedrock IPv4"
+    from_port   = 19132
+    to_port     = 19132
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # SSH は開けない。シェルが要るときは SSM Session Manager を使う
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "AWS APIs, Discord, Cloudflare, and BDS downloads"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = { Name = "minecraft-bedrock" }
@@ -80,6 +69,7 @@ resource "aws_instance" "bedrock" {
   root_block_device {
     volume_type = "gp3"
     volume_size = 20
+    encrypted   = true
     tags = {
       Project = "Minecraft" # default_tags はボリュームに伝播しないので明示
       Name    = "minecraft-bedrock"

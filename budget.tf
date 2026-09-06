@@ -1,5 +1,5 @@
 # 予算 $5(Project=Minecraft タグのコストのみ)
-# 自動停止が効かなくなって 24 時間回りっぱなし(約 $20/月ペース)になったら
+# 自動停止が効かなくなって 24 時間回りっぱなし(約 $41/月ペース)になったら
 # 予測超過の時点で Discord に通知が飛ぶ
 #
 # 注意: タグでコストを絞るには Billing コンソールで cost allocation tag
@@ -22,6 +22,7 @@ resource "aws_sns_topic_policy" "budget_alerts" {
       Resource  = aws_sns_topic.budget_alerts.arn
       Condition = {
         StringEquals = { "aws:SourceAccount" = local.account_id }
+        ArnLike      = { "aws:SourceArn" = "arn:aws:budgets::${local.account_id}:budget/*" }
       }
     }]
   })

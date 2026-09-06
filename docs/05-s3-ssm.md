@@ -18,7 +18,8 @@ minecraft-bedrock-<account-id>/
 ### Bucket names and the public access block
 
 Bucket names must be **globally unique**, hence the account-ID suffix. And the first
-thing after creating a bucket: block all public access.
+thing after creating a bucket: block all public access and explicitly enable SSE-S3
+encryption at rest.
 
 ```hcl
 resource "aws_s3_bucket_public_access_block" "minecraft" {
@@ -34,7 +35,8 @@ bucket with no reason to be public should be mechanically locked down like this.
 ### Lifecycle rules — automating cleanup
 
 Backups accumulate forever if you let them. A lifecycle rule on the `backups/` prefix
-**expires objects after 60 days** — no human has to remember to clean up.
+**expires objects after 60 days** and aborts incomplete multipart uploads after seven
+days — no human has to remember to clean up.
 
 ```hcl
 rule {
@@ -52,6 +54,10 @@ boot** via `mc-sync.service`.
 Why this is great: **fixing a server-side script requires no login to the instance.**
 Edit the script in the repo → `terraform apply` (S3 updated) → picked up automatically
 at the next boot. The inside of the server is under Git control too.
+
+After syncing the scripts, `mc-sync.sh` runs `install-bds.sh` to check the official API
+for a newer Bedrock server build. A failed update check triggers the systemd failure
+notification but does not block the already installed server from starting.
 
 ### Keeping the "single source of truth" in S3 — the allowlist
 
@@ -76,7 +82,8 @@ aws ssm put-parameter --type SecureString \
 ```
 
 - Registered **outside** Terraform (so no plaintext ends up in tfstate either)
-- Readers (EC2 / Lambda) get IAM permission to read `/minecraft/*` only (chapter 04)
+- EC2 can read the three named parameters; the notifier Lambda can read only the
+  Discord webhook parameter (chapter 04)
 - No secret appears in code, the repository, or the state file
 
 AWS also offers Secrets Manager (rotation etc., $0.40/secret/month); at this scale, the

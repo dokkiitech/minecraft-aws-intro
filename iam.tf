@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "bedrock" {
         Sid      = "ReadSecrets"
         Effect   = "Allow"
         Action   = ["ssm:GetParameter"]
-        Resource = local.ssm_param_arns
+        Resource = local.secret_param_arns
       },
       {
         Sid       = "SelfStopAndTag"
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy" "notifier" {
         Sid      = "ReadWebhook"
         Effect   = "Allow"
         Action   = ["ssm:GetParameter"]
-        Resource = local.ssm_param_arns
+        Resource = local.webhook_param_arn
       },
       {
         Sid      = "ReadStopReasonTag" # Describe 系はリソース指定不可

@@ -29,6 +29,9 @@ Lambda には Function URL という「その関数専用の HTTPS エンドポ�
 (API Gateway を挟むより簡単・無料)。`NONE` = 誰でも叩ける URL ですが、無認証ではありません。
 **認証はアプリケーション層の Ed25519 署名検証で行います**(次節)。
 
+`authorization_type = "NONE"` の場合、現在の Lambda Function URL に必要な 2 つの
+公開 invoke 権限は AWS プロバイダが作成します。
+
 ## 署名検証 — なりすましリクエストを弾く
 
 Discord は全リクエストに署名(`X-Signature-Ed25519`)を付けます。Bot は Developer Portal で

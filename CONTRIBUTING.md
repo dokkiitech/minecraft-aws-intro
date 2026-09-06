@@ -18,7 +18,8 @@ fixes, translations, and improvements to the Terraform code or the text.
 
 ## Before you open a PR
 
-- For Terraform changes, run `terraform fmt` and `terraform validate`.
+- For Terraform changes, run `./bot/build.sh`, `terraform fmt`, and
+  `terraform validate` (validation reads `bot/function.zip`).
 - For changes to the text, English (`docs/`) is the primary language.
   Updating the Japanese version (`docs/ja/`) in the same PR is appreciated but
   not required — a maintainer or another contributor can follow up.
@@ -49,7 +50,8 @@ Terraform やテキストの改善など、あらゆるコントリビューシ�
 
 ## PR を出す前に
 
-- Terraform の変更は `terraform fmt` と `terraform validate` を通してください。
+- Terraform の変更は `./bot/build.sh`、`terraform fmt`、`terraform validate` を
+  通してください(`validate` は `bot/function.zip` を読みます)。
 - テキストは英語版(`docs/`)がメインです。日本語版(`docs/ja/`)も同じ PR で
   更新してもらえると助かりますが、必須ではありません。
 - 構成図のソースは `docs/images/*.drawio` です。変更したら PNG も再エクスポートしてください。

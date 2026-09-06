@@ -93,6 +93,9 @@ Discord で:
 /mc allow add <gamertag>   → 招待制の管理(稼働中なら約 30 秒で反映)
 ```
 
+allowlist が空になると制限を無効化して誰でも参加できる状態になります
+(`allowlist = []` の初期動作と同じ)。最初の名前を追加すると制限が再び有効になります。
+
 Minecraft(統合版)の「サーバー」タブからサーバーを追加し、アドレスに `record_name` の値、
 ポート `19132` で接続します。
 
@@ -104,7 +107,7 @@ Minecraft(統合版)の「サーバー」タブからサーバーを追加し、
 
 ## 7. 中を覗いてみる(おすすめ)
 
-- コンソール → Resource Groups → `Minecraft` で、作った全リソースが一覧できる
+- コンソール → Resource Groups → `Minecraft` で、タグ対応リソースを一覧できる
 - SSH の代わりに: `aws ssm start-session --target $(terraform output -raw instance_id)`
   - `journalctl -u bedrock -f` でサーバーログ、`journalctl -u mc-watchdog -f` で watchdog の動きが見える
 - S3 バケットの `backups/` に停止のたびに tar.gz が増えていく
@@ -128,7 +131,7 @@ Minecraft(統合版)の「サーバー」タブからサーバーを追加し、
   (ワールドが消えます)
 - `StopInstances` を直接叩くとセーブが中途半端になりえます。停止は必ず `/mc stop` か watchdog 経由で
 
-## 片付け(全削除)
+## 完全な片付け
 
 学習が済んだら、あるいはしばらく遊ばないなら:
 

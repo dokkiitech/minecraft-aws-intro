@@ -14,6 +14,12 @@ for f in idle-watchdog.py cloudflare-update.sh alert.sh install-bds.sh mc-sync.s
   fi
 done
 
+update_ok=true
+if ! /usr/local/bin/install-bds.sh; then
+  echo "BDS update check failed; continuing with the installed version" >&2
+  update_ok=false
+fi
+
 # allowlist は S3 の config/allowlist.json が唯一の真実(/mc allow で編集される)
 if [ -d /opt/bedrock ]; then
   if aws s3 cp "${BACKUP_BUCKET%/*}/config/allowlist.json" /opt/bedrock/allowlist.json; then
@@ -22,3 +28,4 @@ if [ -d /opt/bedrock ]; then
 fi
 
 echo "synced scripts from $src"
+$update_ok || exit 1

@@ -99,6 +99,9 @@ In Discord:
 /mc allow add <gamertag>   → manage the invite list (live-reloads in ~30 s)
 ```
 
+An empty allowlist disables enforcement and lets anyone join, matching the
+`allowlist = []` default. Adding the first name enables enforcement again.
+
 In Minecraft (Bedrock), add a server under the Servers tab with your `record_name` and
 port `19132`.
 
@@ -111,7 +114,7 @@ bed** — that is the whole point.
 
 ## 7. Look around inside (recommended)
 
-- Console → Resource Groups → `Minecraft` lists every resource this project created
+- Console → Resource Groups → `Minecraft` lists the tag-supported resources
 - Instead of SSH: `aws ssm start-session --target $(terraform output -raw instance_id)`
   - `journalctl -u bedrock -f` tails the server log; `journalctl -u mc-watchdog -f`
     shows the watchdog at work
@@ -137,7 +140,7 @@ bed** — that is the whole point.
 - Calling `StopInstances` directly can cut a save short. Always stop via `/mc stop` or
   the watchdog
 
-## Teardown (delete everything)
+## Complete teardown
 
 When you are done learning, or won't play for a while:
 

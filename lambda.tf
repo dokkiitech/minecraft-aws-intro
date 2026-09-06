@@ -15,6 +15,7 @@ resource "aws_lambda_function" "bot" {
   source_code_hash = filebase64sha256("${path.module}/bot/function.zip")
   timeout          = 180 # interaction token の期限 15 分より十分内側
   memory_size      = 256
+  depends_on       = [aws_cloudwatch_log_group.bot]
 
   environment {
     variables = {
@@ -41,18 +42,11 @@ resource "aws_cloudwatch_log_group" "notifier" {
   retention_in_days = 30
 }
 
-# 認証は Discord の Ed25519 署名検証で行うので URL 自体は NONE
+# 認証は Discord の Ed25519 署名検証で行うので URL 自体は NONE。
+# AWS provider が Function URL に必要な 2 つの公開 invoke 権限を作成する
 resource "aws_lambda_function_url" "bot" {
   function_name      = aws_lambda_function.bot.function_name
   authorization_type = "NONE"
-}
-
-resource "aws_lambda_permission" "bot_url" {
-  statement_id           = "FunctionURLAllowPublicAccess"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_name          = aws_lambda_function.bot.function_name
-  principal              = "*"
-  function_url_auth_type = "NONE"
 }
 
 # ---------- 通知: EC2 状態変化・予算超過 → Discord ----------
@@ -74,6 +68,7 @@ resource "aws_lambda_function" "notifier" {
   source_code_hash = data.archive_file.notifier.output_base64sha256
   timeout          = 30
   memory_size      = 128
+  depends_on       = [aws_cloudwatch_log_group.notifier]
 
   environment {
     variables = {

@@ -234,7 +234,7 @@ def do_allow(token: str, action: str, gamertag: str | None) -> None:
     names = [e["name"] for e in entries]
 
     def members() -> str:
-        return "\n".join(f"- `{n}`" for n in names) if names else "(空 = 誰も入れません)"
+        return "\n".join(f"- `{n}`" for n in names) if names else "(空 = 誰でも参加できます)"
 
     if action == "list":
         edit_original(token, embed("🔑 allowlist", members(), GREY))

@@ -58,9 +58,9 @@ The answer is a **tag condition**:
 }
 ```
 
-"May operate only on instances tagged `Project=Minecraft`". Since chapter 02's
-`default_tags` puts that tag on everything, permissions are automatically confined to
-this project. A pattern well worth memorizing for real-world work.
+"May operate only on instances tagged `Project=Minecraft`". Chapter 02's
+`default_tags` puts that tag on the EC2 instance, so permissions are automatically
+confined to this project. A pattern well worth memorizing for real-world work.
 
 > The `Describe*` actions use `Resource = "*"` because AWS does not support
 > resource-level restrictions for them (read-only, so acceptable).
