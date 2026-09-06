@@ -84,5 +84,5 @@ terraform destroy
 Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
 (direct pushes to `main` are not accepted; contribute via fork + PR).
 
-This project is a generalized version of a setup actually operated in
-[dokkiitech/dokkiitech-infra](https://github.com/dokkiitech/dokkiitech-infra).
+This project is a generalized version of a setup the author actually runs in
+production (managed in a private infrastructure repository).
